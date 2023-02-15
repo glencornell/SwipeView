@@ -1,0 +1,6 @@
+*.o
+*~
+.qmake.stash
+Makefile
+moc_*
+swipeview-test
