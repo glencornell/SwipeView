@@ -7,10 +7,14 @@ QSwipeView::QSwipeView(QWidget *parent) :
 {
 }
 
+QSwipeView::~QSwipeView()
+{
+}
+
 int QSwipeView::minSwipeDistance() const
 {
   // The minimum swipe distance required to move to the prev/next page
-  return (vertical ?
+  return (m_swipeVertical ?
           frameRect().height() :
           frameRect().width()) / 3;
 }
@@ -35,6 +39,16 @@ void QSwipeView::swipeVelocity(int swipeVelocity_)
   m_swipeVelocity = swipeVelocity_;
 }
 
+bool QSwipeView::swipeVertical() const
+{
+  return m_swipeVertical;
+}
+
+void QSwipeView::swipeVertical(bool swipeVertical_)
+{
+  m_swipeVertical = swipeVertical_;
+}
+
 void QSwipeView::mousePressEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton) {
@@ -45,8 +59,8 @@ void QSwipeView::mousePressEvent(QMouseEvent *event)
       w->show();
       w->raise();
       w->move(QPoint {
-          vertical ? 0 : currentWidget()->x() - frameRect().width(),
-          vertical ? currentWidget()->y() - frameRect().height() : 0
+          m_swipeVertical ? 0 : currentWidget()->x() - frameRect().width(),
+          m_swipeVertical ? currentWidget()->y() - frameRect().height() : 0
         });
     }
     if ((w = widget(currentIndex() + 1)) != nullptr) {
@@ -54,8 +68,8 @@ void QSwipeView::mousePressEvent(QMouseEvent *event)
       w->show();
       w->raise();
       w->move(QPoint {
-          vertical ? 0 : currentWidget()->x() + frameRect().width(),
-          vertical ? currentWidget()->y() + frameRect().height() : 0
+          m_swipeVertical ? 0 : currentWidget()->x() + frameRect().width(),
+          m_swipeVertical ? currentWidget()->y() + frameRect().height() : 0
         });
     }
   }
@@ -67,8 +81,8 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
   if (event->buttons() & Qt::LeftButton) {
     if (count() >= 1) {
       const QPoint movePos { event->pos() };
-      const int begin       = vertical ? pressPos.y() : pressPos.x();
-      const int end         = vertical ? movePos.y()  : movePos.x();
+      const int begin       = m_swipeVertical ? pressPos.y() : pressPos.x();
+      const int end         = m_swipeVertical ? movePos.y()  : movePos.x();
       const int distance    = end - begin;
       const int minDistance = minSwipeDistance();
       const int frameWidth   = frameRect().width();
@@ -76,24 +90,24 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
     
       QWidget *w;
       QPoint newPos {
-        vertical ? 0 : distance,
-        vertical ? distance : 0
+        m_swipeVertical ? 0 : distance,
+        m_swipeVertical ? distance : 0
       };
       if ((distance > minDistance) && (currentIndex() == 0)) {
         newPos = QPoint {
-          vertical ? 0 : minDistance,
-          vertical ? minDistance : 0
+          m_swipeVertical ? 0 : minDistance,
+          m_swipeVertical ? minDistance : 0
         };
       } else if ((distance < -minDistance) && (currentIndex() == (count() - 1))) {
         newPos = QPoint {
-          vertical ? 0 : - minDistance,
-          vertical ? - minDistance : 0
+          m_swipeVertical ? 0 : - minDistance,
+          m_swipeVertical ? - minDistance : 0
         };
       }
       if ((w = widget(currentIndex() - 1)) != nullptr) {
         w->move(QPoint {
-            vertical ? 0 : newPos.x() - frameWidth,
-            vertical ? newPos.y() - frameHeight : 0
+            m_swipeVertical ? 0 : newPos.x() - frameWidth,
+            m_swipeVertical ? newPos.y() - frameHeight : 0
           });
       }
       if ((w = currentWidget()) != nullptr) {
@@ -101,8 +115,8 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
       }
       if ((w = widget(currentIndex() + 1)) != nullptr) {
         w->move(QPoint {
-            vertical ? 0 : newPos.x() + frameWidth,
-            vertical ? newPos.y() + frameHeight : 0
+            m_swipeVertical ? 0 : newPos.x() + frameWidth,
+            m_swipeVertical ? newPos.y() + frameHeight : 0
           });
       }
     }
@@ -113,11 +127,11 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
 void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
 {
   const QPoint movePos { event->pos() };
-  const int begin        = vertical ? pressPos.y() : pressPos.x();
-  const int end          = vertical ? movePos.y()  : movePos.x();
+  const int begin        = m_swipeVertical ? pressPos.y() : pressPos.x();
+  const int end          = m_swipeVertical ? movePos.y()  : movePos.x();
   const int distance     = end - begin;
   const int minDistance  = minSwipeDistance();
-  const int velocity     = vertical ? event->point(event->pointCount() - 1).velocity().y() : event->point(event->pointCount() - 1).velocity().x();
+  const int velocity     = m_swipeVertical ? event->point(event->pointCount() - 1).velocity().y() : event->point(event->pointCount() - 1).velocity().x();
   const int minVelocity  = swipeVelocity();
   const int frameWidth   = frameRect().width();
   const int frameHeight  = frameRect().height();
@@ -137,36 +151,36 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
       // go to previous page
       prevWidgetNewPos = { 0, 0 };
       currWidgetNewPos = {
-        vertical ? 0 : frameWidth,
-        vertical ? frameHeight : 0
+        m_swipeVertical ? 0 : frameWidth,
+        m_swipeVertical ? frameHeight : 0
       };
       nextWidgetNewPos = {
-        vertical ? 0 : (2 * frameWidth),
-        vertical ? (2 * frameHeight) : 0
+        m_swipeVertical ? 0 : (2 * frameWidth),
+        m_swipeVertical ? (2 * frameHeight) : 0
       };
       goingToPage = currentIndex() - 1;
     } else if ((((distance < -minDistance)) || (velocity < -minVelocity)) && (currentIndex() < (count() - 1))) {
       // go to next page
       prevWidgetNewPos = {
-        vertical ? 0 : (-2 * frameWidth),
-        vertical ? (-2 * frameHeight) : 0
+        m_swipeVertical ? 0 : (-2 * frameWidth),
+        m_swipeVertical ? (-2 * frameHeight) : 0
       };
       currWidgetNewPos = {
-        vertical ? 0 : -frameWidth,
-        vertical ? -frameHeight : 0
+        m_swipeVertical ? 0 : -frameWidth,
+        m_swipeVertical ? -frameHeight : 0
       };
       nextWidgetNewPos = { 0, 0 };
       goingToPage = currentIndex() + 1;
     } else {
       // snap back to the beginning of the same page
       prevWidgetNewPos = {
-        vertical ? 0 : -frameWidth,
-        vertical ? -frameHeight : 0
+        m_swipeVertical ? 0 : -frameWidth,
+        m_swipeVertical ? -frameHeight : 0
       };
       currWidgetNewPos = { 0, 0 };
       nextWidgetNewPos = {
-        vertical ? 0 : frameWidth,
-        vertical ? frameHeight : 0
+        m_swipeVertical ? 0 : frameWidth,
+        m_swipeVertical ? frameHeight : 0
       };
       goingToPage = currentIndex();
     }
@@ -233,16 +247,16 @@ bool QSwipeView::gotoPage(int index) {
       // go to a previous page
       prevWidgetNewPos = { 0, 0 };
       currWidgetNewPos = {
-        vertical ? 0 : frameWidth,
-        vertical ? frameHeight : 0
+        m_swipeVertical ? 0 : frameWidth,
+        m_swipeVertical ? frameHeight : 0
       };
       if ((w = widget(index)) != nullptr) {
         w->setGeometry ( 0,  0, frameWidth, frameHeight );
         w->show();
         w->raise();
         w->move(QPoint {
-            vertical ? 0 : - frameWidth,
-            vertical ? - frameHeight : 0
+            m_swipeVertical ? 0 : - frameWidth,
+            m_swipeVertical ? - frameHeight : 0
           });
         anim = new QPropertyAnimation(w, "pos");
         anim->setDuration(m_animationSpeed);
@@ -263,8 +277,8 @@ bool QSwipeView::gotoPage(int index) {
     } else if (index > currentIndex()) {
       // go to a later page
       currWidgetNewPos = {
-        vertical ? 0 : -frameWidth,
-        vertical ? -frameHeight : 0
+        m_swipeVertical ? 0 : -frameWidth,
+        m_swipeVertical ? -frameHeight : 0
       };
       nextWidgetNewPos = { 0, 0 };
       if ((w = currentWidget()) != nullptr) {
@@ -280,8 +294,8 @@ bool QSwipeView::gotoPage(int index) {
         w->show();
         w->raise();
         w->move(QPoint {
-            vertical ? 0 : frameWidth,
-            vertical ? frameHeight : 0
+            m_swipeVertical ? 0 : frameWidth,
+            m_swipeVertical ? frameHeight : 0
           });
         anim = new QPropertyAnimation(w, "pos");
         anim->setDuration(m_animationSpeed);
