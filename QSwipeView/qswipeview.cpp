@@ -50,7 +50,7 @@ void QSwipeView::mousePressEvent(QMouseEvent *event)
         });
     }
     if ((w = currentWidget()) != nullptr) {
-      gotoPage = 0;
+      goingToPage = 0;
     }
     if ((w = widget(currentIndex() + 1)) != nullptr) {
       w->setGeometry ( 0,  0, frameRect().width(), frameRect().height() );
@@ -144,7 +144,7 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
         vertical ? 0 : (2 * frameWidth),
         vertical ? (2 * frameHeight) : 0
       };
-      gotoPage = currentIndex() - 1;
+      goingToPage = currentIndex() - 1;
     } else if ((((distance < -minDistance)) || (velocity < -minVelocity)) && (currentIndex() < (count() - 1))) {
       // go to next page
       prevWidgetNewPos = {
@@ -156,7 +156,7 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
         vertical ? -frameHeight : 0
       };
       nextWidgetNewPos = { 0, 0 };
-      gotoPage = currentIndex() + 1;
+      goingToPage = currentIndex() + 1;
     } else {
       // snap back to the beginning of the same page
       prevWidgetNewPos = {
@@ -168,7 +168,7 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
         vertical ? 0 : frameWidth,
         vertical ? frameHeight : 0
       };
-      gotoPage = currentIndex();
+      goingToPage = currentIndex();
     }
 
     if ((w = widget(currentIndex() - 1)) != nullptr) {
@@ -203,11 +203,145 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
 
 void QSwipeView::onAnimationFinished() {
   QWidget *w;
-  setCurrentIndex(gotoPage);
+  setCurrentIndex(goingToPage);
   if ((w = widget(currentIndex() - 1)) != nullptr) {
     w->hide();
   }
   if ((w = widget(currentIndex() + 1)) != nullptr) {
     w->hide();
   }
+  emit animationFinished();
+}
+
+bool QSwipeView::gotoPage(int index) {
+  bool rval = false;
+  
+  if (count() >= 1 && index >= 0 && index < count()) {
+    const int frameWidth   = frameRect().width();
+    const int frameHeight  = frameRect().height();
+    
+    QWidget *w;
+    QParallelAnimationGroup *animgroup = new QParallelAnimationGroup;
+    QPropertyAnimation *anim;
+    QPoint prevWidgetNewPos;
+    QPoint currWidgetNewPos;
+    QPoint nextWidgetNewPos;
+
+    rval = true;
+    
+    if (index < currentIndex()) {
+      // go to a previous page
+      prevWidgetNewPos = { 0, 0 };
+      currWidgetNewPos = {
+        vertical ? 0 : frameWidth,
+        vertical ? frameHeight : 0
+      };
+      nextWidgetNewPos = {
+        vertical ? 0 : (2 * frameWidth),
+        vertical ? (2 * frameHeight) : 0
+      };
+      if ((w = widget(index)) != nullptr) {
+        w->setGeometry ( 0,  0, frameWidth, frameHeight );
+        w->show();
+        w->raise();
+        w->move(QPoint {
+            vertical ? 0 : - frameWidth,
+            vertical ? - frameHeight : 0
+          });
+        anim = new QPropertyAnimation(w, "pos");
+        anim->setDuration(m_animationSpeed);
+        anim->setEasingCurve(QEasingCurve::OutQuart);
+        anim->setStartValue(w->pos());
+        anim->setEndValue(prevWidgetNewPos);
+        animgroup->addAnimation(anim);
+      }
+      if ((w = currentWidget()) != nullptr) {
+        anim = new QPropertyAnimation(w, "pos");
+        anim->setDuration(m_animationSpeed);
+        anim->setEasingCurve(QEasingCurve::OutQuart);
+        anim->setStartValue(w->pos());
+        anim->setEndValue(currWidgetNewPos);
+        animgroup->addAnimation(anim);
+      }
+      if ((w = widget(currentIndex() + 1)) != nullptr) {
+        w->setGeometry ( 0,  0, frameWidth, frameHeight );
+        w->show();
+        w->raise();
+        w->move(QPoint {
+            vertical ? 0 : frameWidth,
+            vertical ? frameHeight : 0
+          });
+        anim = new QPropertyAnimation(w, "pos");
+        anim->setDuration(m_animationSpeed);
+        anim->setEasingCurve(QEasingCurve::OutQuart);
+        anim->setStartValue(w->pos());
+        anim->setEndValue(nextWidgetNewPos);
+        animgroup->addAnimation(anim);
+      }
+      goingToPage = index;
+    } else if (index > currentIndex()) {
+      // go to a later page
+      prevWidgetNewPos = {
+        vertical ? 0 : (-2 * frameWidth),
+        vertical ? (-2 * frameHeight) : 0
+      };
+      currWidgetNewPos = {
+        vertical ? 0 : -frameWidth,
+        vertical ? -frameHeight : 0
+      };
+      nextWidgetNewPos = { 0, 0 };
+      if ((w = widget(index - 1)) != nullptr) {
+        w->setGeometry ( 0,  0, frameWidth, frameHeight );
+        w->show();
+        w->raise();
+        w->move(QPoint {
+            vertical ? 0 : - frameWidth,
+            vertical ? - frameHeight : 0
+          });
+        anim = new QPropertyAnimation(w, "pos");
+        anim->setDuration(m_animationSpeed);
+        anim->setEasingCurve(QEasingCurve::OutQuart);
+        anim->setStartValue(w->pos());
+        anim->setEndValue(prevWidgetNewPos);
+        animgroup->addAnimation(anim);
+      }
+      if ((w = currentWidget()) != nullptr) {
+        anim = new QPropertyAnimation(w, "pos");
+        anim->setDuration(m_animationSpeed);
+        anim->setEasingCurve(QEasingCurve::OutQuart);
+        anim->setStartValue(w->pos());
+        anim->setEndValue(currWidgetNewPos);
+        animgroup->addAnimation(anim);
+      }
+      if ((w = widget(index)) != nullptr) {
+        w->setGeometry ( 0,  0, frameWidth, frameHeight );
+        w->show();
+        w->raise();
+        w->move(QPoint {
+            vertical ? 0 : frameWidth,
+            vertical ? frameHeight : 0
+          });
+        anim = new QPropertyAnimation(w, "pos");
+        anim->setDuration(m_animationSpeed);
+        anim->setEasingCurve(QEasingCurve::OutQuart);
+        anim->setStartValue(w->pos());
+        anim->setEndValue(nextWidgetNewPos);
+        animgroup->addAnimation(anim);
+      }
+      goingToPage = index;
+    } else {
+      goingToPage = currentIndex();
+    }
+    QObject::connect(animgroup, &QParallelAnimationGroup::finished, this, &QSwipeView::onAnimationFinished);
+    animgroup->start(QAbstractAnimation::DeleteWhenStopped);
+  }
+  return rval;
+}
+
+bool QSwipeView::gotoPrevPage() {
+  return gotoPage(currentIndex() - 1);
+}
+
+bool QSwipeView::gotoNextPage() {
+  return gotoPage(currentIndex() + 1);
 }

@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS = QSwipeView examples
+SUBDIRS = QPageIndicator QSwipeView examples

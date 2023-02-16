@@ -1,3 +1,3 @@
 TEMPLATE = lib
 QT += core gui widgets
-include($$PWD/QSwipeView.pri)
+include($$PWD/QPageIndicator.pri)

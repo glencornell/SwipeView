@@ -14,6 +14,12 @@ public:
   int animationSpeed() const;
   void swipeVelocity(int swipeVelocity_);
   int swipeVelocity() const;
+  bool gotoPage(int index);
+  bool gotoNextPage();
+  bool gotoPrevPage();
+
+signals:
+  void animationFinished(void);
 
 protected:
   void mousePressEvent(QMouseEvent *event) override;
@@ -28,6 +34,6 @@ private:
   QPoint pressPos { 0, 0 };
   int m_animationSpeed { 300 };
   int m_swipeVelocity { 100 };
-  int gotoPage { -1 };
+  int goingToPage { -1 };
 };
 

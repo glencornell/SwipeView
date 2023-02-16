@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS = swipeview-test
+SUBDIRS = swipeview-test demo
