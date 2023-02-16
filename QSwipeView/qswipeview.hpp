@@ -16,10 +16,12 @@ protected:
 
 private:
   int minSwipeDistance() const;
+  void onAnimationFinished();
   
   bool vertical { false };
   QPoint pressPos { 0, 0 };
   QPoint movePos { 0, 0 };
   int animationSpeed_ms { 300 };
+  int gotoPage { -1 };
 };
 

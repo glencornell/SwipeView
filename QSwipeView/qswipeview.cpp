@@ -17,8 +17,31 @@ int QSwipeView::minSwipeDistance() const
 
 void QSwipeView::mousePressEvent(QMouseEvent *event)
 {
-  if (event->button() == Qt::LeftButton)
+  if (event->button() == Qt::LeftButton) {
     pressPos = event->pos();
+    QWidget *w;
+    if ((w = widget(currentIndex() - 1)) != nullptr) {
+      w->setGeometry ( 0,  0, frameRect().width(), frameRect().height() );
+      w->show();
+      w->raise();
+      w->move(QPoint {
+          vertical ? 0 : currentWidget()->x() - frameRect().width(),
+          vertical ? currentWidget()->y() - frameRect().height() : 0
+        });
+    }
+    if ((w = currentWidget()) != nullptr) {
+      gotoPage = 0;
+    }
+    if ((w = widget(currentIndex() + 1)) != nullptr) {
+      w->setGeometry ( 0,  0, frameRect().width(), frameRect().height() );
+      w->show();
+      w->raise();
+      w->move(QPoint {
+          vertical ? 0 : currentWidget()->x() + frameRect().width(),
+          vertical ? currentWidget()->y() + frameRect().height() : 0
+        });
+    }
+  }
   QStackedWidget::mousePressEvent(event);
 }
 
@@ -31,6 +54,7 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
       const int end         = vertical ? movePos.y()  : movePos.x();
       const int distance    = end - begin;
       const int minDistance = minSwipeDistance();
+      QWidget *w;
       QPoint newPos {
         vertical ? 0 : distance,
         vertical ? distance : 0
@@ -46,7 +70,21 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
           vertical ? - minDistance : 0
         };
       }
-      currentWidget()->move(newPos);
+      if ((w = widget(currentIndex() - 1)) != nullptr) {
+        w->move(QPoint {
+            vertical ? 0 : newPos.x() - frameRect().width(),
+            vertical ? newPos.y() - frameRect().height() : 0
+          });
+      }
+      if ((w = currentWidget()) != nullptr) {
+        w->move(newPos);
+      }
+      if ((w = widget(currentIndex() + 1)) != nullptr) {
+        w->move(QPoint {
+            vertical ? 0 : newPos.x() + frameRect().width(),
+            vertical ? newPos.y() + frameRect().height() : 0
+          });
+      }
     }
   }
   QStackedWidget::mouseMoveEvent(event);
@@ -58,36 +96,94 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
   const int end          = vertical ? movePos.y()  : movePos.x();
   const int distance     = end - begin;
   const int minDistance = minSwipeDistance();
-  bool pageChanged = false;
+  const int frameWidth = frameRect().width();
+  const int frameHeight = frameRect().height();
+  QWidget *w;
+  QParallelAnimationGroup *animgroup = new QParallelAnimationGroup;
+  QPropertyAnimation *anim;
+  QPoint prevWidgetNewPos;
+  QPoint currWidgetNewPos;
+  QPoint nextWidgetNewPos;
   
   // TODO: account for velocity as well as position.  If the distance
   // traveled is more than the minimum distance threshold OR the
   // velocity is greater than TBD threshold, then go to the next page.
-  if (distance > minDistance) {
-    // go to previous page 
-    QWidget *oldWidget = currentWidget();
-    setCurrentIndex(currentIndex() - 1); // down the stack
-    oldWidget->move(QPoint {0, 0});
-    pageChanged = true;
-  } else if (distance < -minDistance) {
-    // go to next page
-    QWidget *oldWidget = currentWidget();
-    setCurrentIndex(currentIndex() + 1); // up the stack
-    oldWidget->move(QPoint {0, 0});
-    pageChanged = true;
-  }
+  if (count() >= 1) {
+    if ((distance > minDistance) && (currentIndex() >= 1)) {
+      // go to previous page
+      prevWidgetNewPos = { 0, 0 };
+      currWidgetNewPos = {
+        vertical ? 0 : frameWidth,
+        vertical ? frameHeight : 0
+      };
+      nextWidgetNewPos = {
+        vertical ? 0 : (2 * frameWidth),
+        vertical ? (2 * frameHeight) : 0
+      };
+      gotoPage = currentIndex() - 1;
+    } else if ((distance < -minDistance) && (currentIndex() < (count() - 1))) {
+      // go to next page
+      prevWidgetNewPos = {
+        vertical ? 0 : (-2 * frameWidth),
+        vertical ? (-2 * frameHeight) : 0
+      };
+      currWidgetNewPos = {
+        vertical ? 0 : -frameWidth,
+        vertical ? -frameHeight : 0
+      };
+      nextWidgetNewPos = { 0, 0 };
+      gotoPage = currentIndex() + 1;
+    } else {
+      // snap back to the beginning of the same page
+      prevWidgetNewPos = {
+        vertical ? 0 : -frameWidth,
+        vertical ? -frameHeight : 0
+      };
+      currWidgetNewPos = { 0, 0 };
+      nextWidgetNewPos = {
+        vertical ? 0 : frameWidth,
+        vertical ? frameHeight : 0
+      };
+      gotoPage = currentIndex();
+    }
 
-  if (!pageChanged) {
-    // stay on the current page but move the top stacked widget back
-    // to its origin
-    QPropertyAnimation *slideCurrentPageHomeAnimation = new QPropertyAnimation(currentWidget(), "pos");
-    slideCurrentPageHomeAnimation->setDuration(animationSpeed_ms);
-    slideCurrentPageHomeAnimation->setEasingCurve(QEasingCurve::OutQuart);
-    slideCurrentPageHomeAnimation->setStartValue(currentWidget()->pos());
-    slideCurrentPageHomeAnimation->setEndValue(QPoint{0,0});
-    QParallelAnimationGroup *animgroup = new QParallelAnimationGroup;
-    animgroup->addAnimation(slideCurrentPageHomeAnimation);
+    if ((w = widget(currentIndex() - 1)) != nullptr) {
+      anim = new QPropertyAnimation(w, "pos");
+      anim->setDuration(animationSpeed_ms);
+      anim->setEasingCurve(QEasingCurve::OutQuart);
+      anim->setStartValue(w->pos());
+      anim->setEndValue(prevWidgetNewPos);
+      animgroup->addAnimation(anim);
+    }
+    if ((w = currentWidget()) != nullptr) {
+      anim = new QPropertyAnimation(w, "pos");
+      anim->setDuration(animationSpeed_ms);
+      anim->setEasingCurve(QEasingCurve::OutQuart);
+      anim->setStartValue(w->pos());
+      anim->setEndValue(currWidgetNewPos);
+      animgroup->addAnimation(anim);
+    }
+    if ((w = widget(currentIndex() + 1)) != nullptr) {
+      anim = new QPropertyAnimation(w, "pos");
+      anim->setDuration(animationSpeed_ms);
+      anim->setEasingCurve(QEasingCurve::OutQuart);
+      anim->setStartValue(w->pos());
+      anim->setEndValue(nextWidgetNewPos);
+      animgroup->addAnimation(anim);
+    }
+    QObject::connect(animgroup, &QParallelAnimationGroup::finished, this, &QSwipeView::onAnimationFinished);
     animgroup->start(QAbstractAnimation::DeleteWhenStopped);
   }
   QStackedWidget::mouseReleaseEvent(event);
+}
+
+void QSwipeView::onAnimationFinished() {
+  QWidget *w;
+  setCurrentIndex(gotoPage);
+  if ((w = widget(currentIndex() - 1)) != nullptr) {
+    w->hide();
+  }
+  if ((w = widget(currentIndex() + 1)) != nullptr) {
+    w->hide();
+  }
 }
