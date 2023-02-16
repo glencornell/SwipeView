@@ -49,9 +49,6 @@ void QSwipeView::mousePressEvent(QMouseEvent *event)
           vertical ? currentWidget()->y() - frameRect().height() : 0
         });
     }
-    if ((w = currentWidget()) != nullptr) {
-      goingToPage = 0;
-    }
     if ((w = widget(currentIndex() + 1)) != nullptr) {
       w->setGeometry ( 0,  0, frameRect().width(), frameRect().height() );
       w->show();
@@ -74,6 +71,9 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
       const int end         = vertical ? movePos.y()  : movePos.x();
       const int distance    = end - begin;
       const int minDistance = minSwipeDistance();
+      const int frameWidth   = frameRect().width();
+      const int frameHeight  = frameRect().height();
+    
       QWidget *w;
       QPoint newPos {
         vertical ? 0 : distance,
@@ -92,8 +92,8 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
       }
       if ((w = widget(currentIndex() - 1)) != nullptr) {
         w->move(QPoint {
-            vertical ? 0 : newPos.x() - frameRect().width(),
-            vertical ? newPos.y() - frameRect().height() : 0
+            vertical ? 0 : newPos.x() - frameWidth,
+            vertical ? newPos.y() - frameHeight : 0
           });
       }
       if ((w = currentWidget()) != nullptr) {
@@ -101,8 +101,8 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
       }
       if ((w = widget(currentIndex() + 1)) != nullptr) {
         w->move(QPoint {
-            vertical ? 0 : newPos.x() + frameRect().width(),
-            vertical ? newPos.y() + frameRect().height() : 0
+            vertical ? 0 : newPos.x() + frameWidth,
+            vertical ? newPos.y() + frameHeight : 0
           });
       }
     }
@@ -216,7 +216,7 @@ void QSwipeView::onAnimationFinished() {
 bool QSwipeView::gotoPage(int index) {
   bool rval = false;
   
-  if (count() >= 1 && index >= 0 && index < count()) {
+  if (count() >= 1 && 0 <= index && index < count()) {
     const int frameWidth   = frameRect().width();
     const int frameHeight  = frameRect().height();
     
@@ -235,10 +235,6 @@ bool QSwipeView::gotoPage(int index) {
       currWidgetNewPos = {
         vertical ? 0 : frameWidth,
         vertical ? frameHeight : 0
-      };
-      nextWidgetNewPos = {
-        vertical ? 0 : (2 * frameWidth),
-        vertical ? (2 * frameHeight) : 0
       };
       if ((w = widget(index)) != nullptr) {
         w->setGeometry ( 0,  0, frameWidth, frameHeight );
@@ -263,48 +259,14 @@ bool QSwipeView::gotoPage(int index) {
         anim->setEndValue(currWidgetNewPos);
         animgroup->addAnimation(anim);
       }
-      if ((w = widget(currentIndex() + 1)) != nullptr) {
-        w->setGeometry ( 0,  0, frameWidth, frameHeight );
-        w->show();
-        w->raise();
-        w->move(QPoint {
-            vertical ? 0 : frameWidth,
-            vertical ? frameHeight : 0
-          });
-        anim = new QPropertyAnimation(w, "pos");
-        anim->setDuration(m_animationSpeed);
-        anim->setEasingCurve(QEasingCurve::OutQuart);
-        anim->setStartValue(w->pos());
-        anim->setEndValue(nextWidgetNewPos);
-        animgroup->addAnimation(anim);
-      }
       goingToPage = index;
     } else if (index > currentIndex()) {
       // go to a later page
-      prevWidgetNewPos = {
-        vertical ? 0 : (-2 * frameWidth),
-        vertical ? (-2 * frameHeight) : 0
-      };
       currWidgetNewPos = {
         vertical ? 0 : -frameWidth,
         vertical ? -frameHeight : 0
       };
       nextWidgetNewPos = { 0, 0 };
-      if ((w = widget(index - 1)) != nullptr) {
-        w->setGeometry ( 0,  0, frameWidth, frameHeight );
-        w->show();
-        w->raise();
-        w->move(QPoint {
-            vertical ? 0 : - frameWidth,
-            vertical ? - frameHeight : 0
-          });
-        anim = new QPropertyAnimation(w, "pos");
-        anim->setDuration(m_animationSpeed);
-        anim->setEasingCurve(QEasingCurve::OutQuart);
-        anim->setStartValue(w->pos());
-        anim->setEndValue(prevWidgetNewPos);
-        animgroup->addAnimation(anim);
-      }
       if ((w = currentWidget()) != nullptr) {
         anim = new QPropertyAnimation(w, "pos");
         anim->setDuration(m_animationSpeed);

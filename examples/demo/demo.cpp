@@ -12,14 +12,15 @@ demo::demo(QWidget *parent) :
         ui->prev->setEnabled(false);
         ui->next->setEnabled(false);
       }
-      ui->pageIndicator->setCurrentPage(ui->pageIndicator->getCurrentPage() - 1);
     });
   connect(ui->next,&QAbstractButton::clicked,[this]{
       if(ui->stackedWidget->gotoNextPage()){
         ui->prev->setEnabled(false);
         ui->next->setEnabled(false);
       }
-      ui->pageIndicator->setCurrentPage(ui->pageIndicator->getCurrentPage() + 1);
+    });
+  connect(ui->stackedWidget,&QSwipeView::currentChanged,[this]{
+      ui->pageIndicator->setCurrentPage(ui->stackedWidget->currentIndex());
     });
   connect(ui->stackedWidget,&QSwipeView::animationFinished,[this]{
       ui->prev->setEnabled(true);
