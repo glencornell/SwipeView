@@ -3,7 +3,8 @@ TARGET = swipeview-test
 
 QT += core gui widgets
 
-include(QSwipeView/QSwipeView.pri)
+include($$PWD/../../QSwipeView/QSwipeView.pri)
+#INCLUDEPATH += 
 
 SOURCES += \
     main.cpp
