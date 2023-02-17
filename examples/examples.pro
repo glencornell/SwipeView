@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS = swipeview-test vertical-test demo
+SUBDIRS = swipeview-test vertical-test demo qswipeviewplugin
