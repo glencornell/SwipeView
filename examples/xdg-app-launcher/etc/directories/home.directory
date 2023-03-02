@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name = Home
+Type = Directory
+# Although this adheres to the XDG desktop standard, this extension is
+# not interpreted by anything that I know of except my code.  It's
+# used to place wallpaper or a background image on the menu.
+X-Background-Image = wp.png

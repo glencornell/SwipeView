@@ -1,0 +1,13 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+  <!-- In my interpretation of the XDG Menu Spec, the Name is required
+       but ignored when it is included in a <Mergefile> element -->
+  <Name>Preferences</Name>
+  <Include>
+    <Filename>firefox.desktop</Filename>
+    <Filename>slack.desktop</Filename>
+    <Filename>htop.desktop</Filename>
+  </Include>
+</Menu>

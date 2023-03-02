@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Calculator
+Comment=Perform arithmetic, scientific or financial calculations
+Keywords=calculation;arithmetic;scientific;financial;
+Exec=gnome-calculator
+Icon=/usr/share/icons/Yaru/48x48/apps/calculator-app.png
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;Utility;Calculator;
