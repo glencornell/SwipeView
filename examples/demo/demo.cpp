@@ -27,6 +27,9 @@ demo::demo(QWidget *parent) :
       ui->next->setEnabled(true);
     });
   ui->pageIndicator->setEnabled(false);
+  connect(ui->pageIndicator,&QPageIndicator::pageChanged,[this]{
+      ui->stackedWidget->gotoPage(ui->pageIndicator->getCurrentPage());
+    });
 }
 
 demo::~demo()

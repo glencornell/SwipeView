@@ -1,0 +1,37 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+  <Name>Home</Name>
+  <Directory>home.directory</Directory>
+  
+  <Include>
+    <Filename>firefox.desktop</Filename>
+    <Filename>slack.desktop</Filename>
+    <Filename>htop.desktop</Filename>
+  </Include>
+  
+  <Menu>
+    <Name>Utilities</Name>
+    <Directory>utilities.directory</Directory>
+    <Include>
+      <Filename>calculator.desktop</Filename>
+      <Filename>clock.desktop</Filename>
+      <Filename>settings.desktop</Filename>
+    </Include>
+  </Menu>
+  
+  <Include>
+    <Filename>signal-desktop.desktop</Filename>
+    <Filename>terminal.desktop</Filename>
+  </Include>
+
+  <!-- A preferences submenu, kept in a separate file so it can also
+  be used standalone -->
+  <Menu>
+    <Name>Preferences</Name>
+    <Directory>preferences.directory</Directory>
+    <Mergefile>preferences.menu</Mergefile>
+  </Menu>
+  
+</Menu>

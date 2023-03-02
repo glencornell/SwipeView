@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Clock
+Comment=World Clock, Timer and Stop Watch
+Keywords=clock;timer;stopwatch
+Exec=/path/to/clock
+Icon=/usr/share/icons/Yaru/48x48/apps/clock-app.png
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Utility;Clock;Timer;Stopwatch
