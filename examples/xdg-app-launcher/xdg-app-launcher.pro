@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = test-layout
+TARGET = xdg-app-launcher
 
 CONFIG += debug
 QT += core gui widgets
@@ -28,7 +28,7 @@ HEADERS += \
     XdgInfo.hpp
 
 SOURCES += \
-    test-layout.cpp \
+    main.cpp \
     XdgAbstractEntry.cpp \
     XdgApplicationEntry.cpp \
     XdgDirectoryEntry.cpp \

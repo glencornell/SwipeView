@@ -87,7 +87,7 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
       const int minDistance = minSwipeDistance();
       const int frameWidth   = frameRect().width();
       const int frameHeight  = frameRect().height();
-    
+
       QWidget *w;
       QPoint newPos {
         m_swipeVertical ? 0 : distance,
@@ -135,14 +135,14 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
   const int minVelocity  = swipeVelocity();
   const int frameWidth   = frameRect().width();
   const int frameHeight  = frameRect().height();
-  
+
   QWidget *w;
   QParallelAnimationGroup *animgroup = new QParallelAnimationGroup;
   QPropertyAnimation *anim;
   QPoint prevWidgetNewPos;
   QPoint currWidgetNewPos;
   QPoint nextWidgetNewPos;
-  
+
   // If the distance traveled is more than the minimum distance
   // threshold OR the velocity is greater than the velocity threshold,
   // then go to the next page.  Otherwise, bounce back to the origin.
@@ -229,11 +229,11 @@ void QSwipeView::onAnimationFinished() {
 
 bool QSwipeView::gotoPage(int index) {
   bool rval = false;
-  
+
   if (count() >= 1 && 0 <= index && index < count()) {
     const int frameWidth   = frameRect().width();
     const int frameHeight  = frameRect().height();
-    
+
     QWidget *w;
     QParallelAnimationGroup *animgroup = new QParallelAnimationGroup;
     QPropertyAnimation *anim;
@@ -242,7 +242,7 @@ bool QSwipeView::gotoPage(int index) {
     QPoint nextWidgetNewPos;
 
     rval = true;
-    
+
     if (index < currentIndex()) {
       // go to a previous page
       prevWidgetNewPos = { 0, 0 };

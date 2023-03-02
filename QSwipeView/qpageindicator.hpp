@@ -7,7 +7,7 @@ class QPageIndicator : public QWidget
   Q_OBJECT
   Q_PROPERTY(int currentPage READ getCurrentPage WRITE setCurrentPage NOTIFY pageChanged);
   Q_PROPERTY(int pageCount READ getPageCount WRITE setPageCount);
-  
+
 public:
   QPageIndicator(QWidget *parent = nullptr);
   QPageIndicator(int count, QWidget *parent = nullptr);
@@ -30,7 +30,7 @@ public slots:
 signals:
   void pageChanged(int currentPage);
   void pageCountChanged(int pageCount);
-  
+
 private:
   int currentPage { 0 };
   int pageCount { 0 };

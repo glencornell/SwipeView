@@ -29,5 +29,5 @@ Because the files are stored locally, you need to set the
 find the `home.menu` and all of it's referenced children.
 
 ```bash
-XDG_DATA_HOME=$(pwd)/etc ./test-layout
+XDG_DATA_HOME=$(pwd)/etc ./xdg-app-launcher
 ```
