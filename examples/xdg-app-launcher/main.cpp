@@ -10,6 +10,7 @@
 #include "XdgDesktopMenu.hpp"
 #include "XdgDesktopFactory.hpp"
 #include <QSwipeView>
+#include <QCompositeSwipeView>
 
 int main(int argc, char *argv[])
 {
@@ -24,9 +25,13 @@ int main(int argc, char *argv[])
   }
   
 #if 1
-  
-  QSwipeView *swipeView = new QSwipeView;
 
+#if 0
+  QCompositeSwipeView *swipeView = new QCompositeSwipeView;
+#else
+  QSwipeView *swipeView = new QSwipeView;
+#endif
+  
   const int rowsPerPage = 2;
   const int columnsPerPage = 2;
   const int iconsPerPage = columnsPerPage * rowsPerPage;
