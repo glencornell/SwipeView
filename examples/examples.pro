@@ -1,3 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS = swipeview-test vertical-test demo xdg-app-launcher
+SUBDIRS += swipeview-test
+SUBDIRS += vertical-test
+SUBDIRS += demo
+SUBDIRS += qswipeviewplugin
+SUBDIRS += xdg-app-launcher
