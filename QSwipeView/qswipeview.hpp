@@ -5,14 +5,14 @@
 class QSwipeView : public QStackedWidget
 {
   Q_OBJECT
-  Q_PROPERTY(int m_animationSpeed READ animationSpeed WRITE animationSpeed);
-  Q_PROPERTY(int m_swipeVelocity READ swipeVelocity WRITE swipeVelocity);
-  Q_PROPERTY(bool m_swipeVertical READ swipeVertical WRITE swipeVertical);
+  Q_PROPERTY(int animationSpeed MEMBER m_animationSpeed READ animationSpeed WRITE animationSpeed);
+  Q_PROPERTY(int swipeVelocity MEMBER m_swipeVelocity READ swipeVelocity WRITE swipeVelocity);
+  Q_PROPERTY(bool swipeVertical MEMBER m_swipeVertical READ swipeVertical WRITE swipeVertical);
 
 public:
   explicit QSwipeView(QWidget *parent = nullptr);
   ~QSwipeView();
-  
+
   void animationSpeed(int animationSpeed_);
   int animationSpeed() const;
   void swipeVelocity(int swipeVelocity_);
@@ -34,7 +34,7 @@ protected:
 private:
   int minSwipeDistance() const;
   void onAnimationFinished();
-  
+
   bool m_swipeVertical { false };
   QPoint pressPos { 0, 0 };
   int m_animationSpeed { 300 };

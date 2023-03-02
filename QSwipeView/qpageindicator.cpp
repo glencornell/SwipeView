@@ -18,7 +18,7 @@ QPageIndicator::QPageIndicator(int count, QWidget *parent) : QWidget(parent), cu
 
   if (count <= 0)
     count = 1;
-  
+
   for (int i = 0; i < count; i++) {
     append();
   }
