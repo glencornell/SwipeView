@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name = System Settings
+Type = Application
+Icon = /usr/share/icons/Yaru/48x48/apps/system-settings.png
+Exec = /usr/bin/unity-control-center

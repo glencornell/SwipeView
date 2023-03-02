@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Slack
+Exec=slack-desktop
+Icon=/usr/share/pixmaps/slack.png
+Categories=GNOME;GTK;Network;InstantMessaging;
+Comment=Slack Desktop

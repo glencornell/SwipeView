@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Categories=System;Monitor;ConsoleOnly;
+Comment=Show System Processes
+Exec=htop
+Icon=/usr/share/icons/Yaru/48x48/apps/system-monitor-app.png
+Keywords=system;process;task
+Name=Htop
+Terminal=True
