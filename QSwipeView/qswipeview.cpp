@@ -52,26 +52,7 @@ void QSwipeView::swipeVertical(bool swipeVertical_)
 void QSwipeView::mousePressEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton) {
-    pressPos = event->pos();
-    QWidget *w;
-    if ((w = widget(currentIndex() - 1)) != nullptr) {
-      w->setGeometry ( 0,  0, frameRect().width(), frameRect().height() );
-      w->show();
-      w->raise();
-      w->move(QPoint {
-          m_swipeVertical ? 0 : currentWidget()->x() - frameRect().width(),
-          m_swipeVertical ? currentWidget()->y() - frameRect().height() : 0
-        });
-    }
-    if ((w = widget(currentIndex() + 1)) != nullptr) {
-      w->setGeometry ( 0,  0, frameRect().width(), frameRect().height() );
-      w->show();
-      w->raise();
-      w->move(QPoint {
-          m_swipeVertical ? 0 : currentWidget()->x() + frameRect().width(),
-          m_swipeVertical ? currentWidget()->y() + frameRect().height() : 0
-        });
-    }
+    pressPos = QCursor::pos();
   }
   QStackedWidget::mousePressEvent(event);
 }
@@ -80,7 +61,22 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
 {
   if (event->buttons() & Qt::LeftButton) {
     if (count() >= 1) {
-      const QPoint movePos { event->pos() };
+      if ((pressPos.x() == -1) || (pressPos.y() == -1)) {
+        // if the mouse button event was missed, we use the sentinel
+        // value of (-1,-1) pressPos to set it to the current cursor
+        // position.  The mouse button press event is missed if the
+        // user presses a pushbutton widget in the hierarchy.  The
+        // only way to get the mousePressEvent from the pushbutton
+        // widget is to call installEventFilter() in notifyChild() for
+        // each new widget that is added in the hierarchy.  Ive
+        // decided not to implement this because it will add
+        // significantly more code when in my use case (the child is a
+        // grid layout with pushbuttons), the impact is minor (the
+        // page doesn't start to swipe until after you traverse the
+        // pushbutton).
+        pressPos = QCursor::pos();
+      }
+      const QPoint movePos { QCursor::pos() };
       const int begin       = m_swipeVertical ? pressPos.y() : pressPos.x();
       const int end         = m_swipeVertical ? movePos.y()  : movePos.x();
       const int distance    = end - begin;
@@ -105,15 +101,27 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
         };
       }
       if ((w = widget(currentIndex() - 1)) != nullptr) {
+        if (!w->isVisible()) {
+          w->setGeometry ( 0,  0, frameWidth, frameHeight );
+          w->show();
+        }
         w->move(QPoint {
             m_swipeVertical ? 0 : newPos.x() - frameWidth,
             m_swipeVertical ? newPos.y() - frameHeight : 0
           });
       }
       if ((w = currentWidget()) != nullptr) {
+        if (!w->isVisible()) {
+          w->setGeometry ( 0,  0, frameWidth, frameHeight );
+          w->show();
+        }
         w->move(newPos);
       }
       if ((w = widget(currentIndex() + 1)) != nullptr) {
+        if (!w->isVisible()) {
+          w->setGeometry ( 0,  0, frameWidth, frameHeight );
+          w->show();
+        }
         w->move(QPoint {
             m_swipeVertical ? 0 : newPos.x() + frameWidth,
             m_swipeVertical ? newPos.y() + frameHeight : 0
@@ -126,7 +134,10 @@ void QSwipeView::mouseMoveEvent(QMouseEvent *event)
 
 void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
 {
-  const QPoint movePos { event->pos() };
+  if ((pressPos.x() == -1) || (pressPos.y() == -1)) {
+    pressPos = QCursor::pos();
+  }
+  const QPoint movePos { QCursor::pos() };
   const int begin        = m_swipeVertical ? pressPos.y() : pressPos.x();
   const int end          = m_swipeVertical ? movePos.y()  : movePos.x();
   const int distance     = end - begin;
@@ -211,6 +222,7 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
     }
     QObject::connect(animgroup, &QParallelAnimationGroup::finished, this, &QSwipeView::onAnimationFinished);
     animgroup->start(QAbstractAnimation::DeleteWhenStopped);
+    pressPos = { -1, -1 };
   }
   QStackedWidget::mouseReleaseEvent(event);
 }
