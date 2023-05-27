@@ -45,7 +45,7 @@ int QCompositeSwipeView::currentIndex() const {
   return ui->swipeView->currentIndex();
 }
 
-int QCompositeSwipeView::indexOf(const QWidget *w) const {
+int QCompositeSwipeView::indexOf(QWidget *w) const {
   return ui->swipeView->indexOf(w);
 }
 

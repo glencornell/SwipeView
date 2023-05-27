@@ -131,7 +131,11 @@ void QSwipeView::mouseReleaseEvent(QMouseEvent *event)
   const int end          = m_swipeVertical ? movePos.y()  : movePos.x();
   const int distance     = end - begin;
   const int minDistance  = minSwipeDistance();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
   const int velocity     = m_swipeVertical ? event->point(event->pointCount() - 1).velocity().y() : event->point(event->pointCount() - 1).velocity().x();
+#else
+  const int velocity     = 0;
+#endif
   const int minVelocity  = swipeVelocity();
   const int frameWidth   = frameRect().width();
   const int frameHeight  = frameRect().height();
