@@ -1,0 +1,5 @@
+add_subdirectory(composite-test)
+add_subdirectory(demo)
+add_subdirectory(qswipeviewplugin)
+add_subdirectory(swipeview-test)
+add_subdirectory(vertical-test)
